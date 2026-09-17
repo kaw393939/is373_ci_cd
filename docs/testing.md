@@ -1,6 +1,6 @@
 # Testing strategy
 
-Status: planned. No tests have been implemented or run. The suite should be small enough that most feedback time comes from runner setup, image builds, and deployment polling rather than test execution.
+Status: unit, integration, and Chromium tests implemented and passing locally; CI evidence will be added during the pipeline work. The suite should be small enough that most feedback time comes from runner setup, image builds, and deployment polling rather than test execution.
 
 ## Test layers
 
@@ -35,7 +35,7 @@ Start with the success and zero-divisor browser scenarios; add the decimal and n
 
 ## Commands and evidence
 
-Planned commands (not available in this documentation phase):
+Test commands (run `make setup` and `make browsers` first):
 
 ```sh
 make test-unit

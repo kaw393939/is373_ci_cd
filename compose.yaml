@@ -1,0 +1,30 @@
+name: is373-ci-cd
+
+services:
+  dev:
+    build:
+      context: .
+    image: is373-ci-cd-dev:local
+    ports:
+      - "127.0.0.1:${DEV_PORT:-8080}:8000"
+    environment:
+      APP_ENV: development
+    volumes:
+      - ./app:/app/app:ro
+    command: [uvicorn, app.main:app, --host, 0.0.0.0, --port, "8000", --reload]
+    labels:
+      wud.watch: "false"
+    restart: unless-stopped
+
+  prod:
+    image: ${PROD_IMAGE:-kaw393939/is373_ci_cd:prod}
+    ports:
+      - "127.0.0.1:8090:8000"
+    environment:
+      APP_ENV: production
+    restart: unless-stopped
+    labels:
+      wud.watch: "true"
+      wud.watch.digest: "true"
+      wud.tag.include: "^prod$$"
+      wud.trigger.include: docker.production
