@@ -1,10 +1,13 @@
 """Small Docker operations shared by local development and CI."""
 
+import base64
 import datetime
 import json
 import os
 from pathlib import Path
 import subprocess
+import re
+import secrets
 import sys
 import time
 import urllib.request
@@ -14,6 +17,7 @@ ROOT = Path(__file__).resolve().parents[1]
 STATE = ROOT / ".state"
 ARTIFACTS = ROOT / "artifacts"
 IMAGE = os.getenv("IMAGE", "is373-ci-cd:local")
+REPOSITORY = "kaw393939/is373_ci_cd"
 
 
 def run(args, **kwargs):
@@ -83,6 +87,76 @@ def test_e2e():
             subprocess.run(["docker", "rm", "-f", container_id], check=True, stdout=subprocess.DEVNULL)
 
 
+def initialize_updater():
+    STATE.mkdir(exist_ok=True)
+    credentials = STATE / "wud.env"
+    if not credentials.exists():
+        with os.fdopen(os.open(credentials, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600), "w") as handle:
+            handle.write("WUD_AUTH_ADMIN_USER=admin\nWUD_AUTH_ADMIN_PASSWORD=" + secrets.token_urlsafe(24) + "\n")
+    print("WUD dashboard: http://localhost:8091 (credentials in ignored .state/wud.env)")
+
+
+def pause_updates():
+    STATE.mkdir(exist_ok=True)
+    (STATE / "updates-paused").touch()
+    compose("stop", "wud")
+    print("Automatic updates are paused. Use make resume-updates deliberately.")
+
+
+def select_release(reference):
+    STATE.mkdir(exist_ok=True)
+    temp = STATE / "release.env.tmp"
+    temp.write_text(f"PROD_IMAGE={reference}\n")
+    temp.replace(STATE / "release.env")
+
+
+def verify_production(reference):
+    expected = output(["docker", "image", "inspect", reference, "--format", '{{index .Config.Labels "org.opencontainers.image.revision"}}'])
+    health = wait_for_health("http://127.0.0.1:8090/health")
+    if health["commit"] != expected or health["environment"] != "production":
+        raise RuntimeError("Production health does not identify the selected release")
+    print(json.dumps(health, indent=2))
+
+
+def rollback():
+    release = os.getenv("RELEASE", "")
+    if re.fullmatch(r"sha-[0-9a-f]{40}", release):
+        reference = f"{REPOSITORY}:{release}"
+    elif re.fullmatch(r"sha256:[0-9a-f]{64}", release):
+        reference = f"{REPOSITORY}@{release}"
+    else:
+        raise SystemExit("Use RELEASE=sha-<full-commit> or RELEASE=sha256:<digest>")
+    pause_updates()
+    run(["docker", "pull", reference])
+    select_release(reference)
+    compose("up", "-d", "--no-deps", "prod")
+    verify_production(reference)
+
+
+def resume_updates():
+    initialize_updater()
+    pause_updates()
+    reference = f"{REPOSITORY}:prod"
+    run(["docker", "pull", reference])
+    select_release(reference)
+    compose("up", "-d", "--no-deps", "prod")
+    verify_production(reference)
+    compose("up", "-d", "wud")
+    (STATE / "updates-paused").unlink(missing_ok=True)
+    print("Production channel restored; automatic updates resumed.")
+
+
+def check_updates():
+    if (STATE / "updates-paused").exists():
+        raise SystemExit("Updates are paused. Use make resume-updates only when the prod channel is safe.")
+    credentials = dict(line.split("=", 1) for line in (STATE / "wud.env").read_text().splitlines())
+    auth = base64.b64encode((credentials["WUD_AUTH_ADMIN_USER"] + ":" + credentials["WUD_AUTH_ADMIN_PASSWORD"]).encode()).decode()
+    request = urllib.request.Request("http://127.0.0.1:8091/api/containers/watch", data=b"", headers={"Authorization": "Basic " + auth}, method="POST")
+    with urllib.request.urlopen(request, timeout=30) as response:
+        response.read()
+    print("Registry check requested. Watch production health or WUD logs for the update.")
+
+
 def main():
     command = sys.argv[1]
     if command == "build":
@@ -92,11 +166,26 @@ def main():
     elif command == "dev":
         compose("up", "-d", "--build", "dev")
     elif command == "up":
+        initialize_updater()
         compose("pull", "prod")
-        compose("up", "-d", "--build")
+        compose("up", "-d", "--build", "dev", "prod")
+        if not (STATE / "updates-paused").exists():
+            compose("up", "-d", "wud")
         print(json.dumps(wait_for_health("http://127.0.0.1:8090/health"), indent=2))
     elif command == "down":
         compose("down")
+    elif command == "rollback":
+        rollback()
+    elif command == "pause-updates":
+        pause_updates()
+    elif command == "resume-updates":
+        resume_updates()
+    elif command == "check-updates":
+        check_updates()
+    elif command == "status":
+        compose("ps")
+        print("Updates:", "paused" if (STATE / "updates-paused").exists() else "enabled")
+        print(json.dumps(wait_for_health("http://127.0.0.1:8090/health"), indent=2))
     else:
         raise SystemExit(f"Unknown command: {command}")
 
