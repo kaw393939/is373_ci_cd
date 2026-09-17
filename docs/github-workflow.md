@@ -14,11 +14,11 @@ The documentation phase adds:
 
 Blank issues remain available so the forms do not block unusual reports. Issues track development units; the milestone tracks the complete demo. A Project board is optional and deferred because the initial backlog is small.
 
-## Proposed branch policy after CI exists
+## Active branch policy
 
-After `verify` has run successfully, configure a `main` ruleset requiring a PR and the `verify` status check, and blocking force pushes and branch deletion. Start with no mandatory reviewer count for the solo-maintainer teaching workflow. Confirm any owner bypass policy when enabling enforcement.
+The `main` branch now requires a PR, an up-to-date passing `verify` check, and resolved review conversations. Force pushes and branch deletion are blocked. Administrator enforcement is enabled: the owner follows the same gates. Zero reviewer approvals are required for this solo-maintainer teaching workflow.
 
-Do not turn on required checks before they exist. No protection/ruleset is enabled by the documentation phase. Protecting `main` is an implementation acceptance item, not something these docs claim is already active.
+Enabled after passing PR run [35257442677](https://github.com/kaw393939/is373_ci_cd/actions/runs/35257442677) and successful first publication [35257605068](https://github.com/kaw393939/is373_ci_cd/actions/runs/35257605068).
 
 Preserve atomic history by using merge commits for implementation PRs. The documentation phase does not disable alternative merge options; contributors follow the documented convention. Avoid auto-merge initially so learners can inspect each stage.
 
