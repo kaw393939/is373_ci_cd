@@ -25,7 +25,11 @@ def run(args, **kwargs):
 
 
 def output(args):
-    return run(args, capture_output=True).stdout.strip()
+    try:
+        return run(args, capture_output=True).stdout.strip()
+    except subprocess.CalledProcessError as error:
+        print(error.stderr or str(error), file=sys.stderr)
+        raise
 
 
 def compose(*args):
@@ -71,6 +75,7 @@ def test_e2e():
     port = int(os.getenv("E2E_PORT", "18090"))
     name = "is373-e2e-" + uuid.uuid4().hex[:10]
     container_id = None
+    startup_error = ""
     try:
         container_id = output(["docker", "run", "-d", "--name", name,
                                "-p", f"127.0.0.1:{port}:8000", "-e", "APP_ENV=test", image_id])
@@ -80,11 +85,17 @@ def test_e2e():
         run(["make", "test-browser", f"BASE_URL=http://127.0.0.1:{port}"], timeout=180)
         record.write_text(json.dumps({"image_id": image_id, "commit": expected_commit, "health": health}, indent=2))
         print(f"Verified image {image_id} at commit {expected_commit}", flush=True)
+    except subprocess.CalledProcessError as error:
+        startup_error = (error.stdout or "") + (error.stderr or "")
+        raise
     finally:
-        if container_id:
-            logs = subprocess.run(["docker", "logs", container_id], capture_output=True, text=True)
-            (ARTIFACTS / "container.log").write_text(logs.stdout + logs.stderr)
-            subprocess.run(["docker", "rm", "-f", container_id], check=True, stdout=subprocess.DEVNULL)
+        # Docker may create the named container before failing to bind the port.
+        target = container_id or name
+        exists = subprocess.run(["docker", "container", "inspect", target], capture_output=True).returncode == 0
+        logs = subprocess.run(["docker", "logs", target], capture_output=True, text=True) if exists else None
+        (ARTIFACTS / "container.log").write_text(startup_error + (logs.stdout + logs.stderr if logs else ""))
+        if exists:
+            subprocess.run(["docker", "rm", "-f", target], check=True, stdout=subprocess.DEVNULL)
 
 
 def initialize_updater():

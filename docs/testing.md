@@ -46,6 +46,8 @@ make test-e2e
 
 `make test-e2e` starts an isolated instance of the already-built release image, waits up to 30 seconds for `/health`, runs browser tests, and cleans up even after failure. It must not accidentally test the development server on `8080` or replace the user's production container on `8090`. Use a configurable isolated port, default `18090`, and pass the base URL to the tests. The artifact tested must be the artifact later published.
 
+Startup failure is also a cleanup case: if the port is occupied, Docker can create a container before reporting the error. The runner removes its unique container name, saves startup diagnostics, and leaves no stale tested-image record. This scenario is tracked and reproduced in [#20](https://github.com/kaw393939/is373_ci_cd/issues/20).
+
 Record test counts and durations separately for unit, integration, build, and browser steps. Retain browser traces/screenshots on failure and application container logs for startup failures. Upload evidence even when the test step fails; keep artifacts seven days for this demo. Never include credentials in logs or artifacts.
 
 ## Speed targets
