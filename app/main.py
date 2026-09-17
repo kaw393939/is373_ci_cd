@@ -1,5 +1,6 @@
 """HTTP contracts and release identity for the demo."""
 
+import json
 import os
 from pathlib import Path
 from typing import Annotated
@@ -53,9 +54,13 @@ def calculate_route(request: CalculationRequest):
 
 @app.get("/health")
 def health():
+    release_file = Path(__file__).with_name("release.json")
+    release = json.loads(release_file.read_text()) if release_file.exists() else {
+        "commit": os.getenv("APP_COMMIT", "local"),
+        "built_at": os.getenv("APP_BUILT_AT", "unavailable"),
+    }
     return {
         "status": "ok",
         "environment": os.getenv("APP_ENV", "development"),
-        "commit": os.getenv("APP_COMMIT", "local"),
-        "built_at": os.getenv("APP_BUILT_AT", "unavailable"),
+        **release,
     }
