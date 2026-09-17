@@ -1,6 +1,6 @@
 # Implementation plan
 
-Status: documentation bootstrap complete locally; implementation issues remain open. Follow the linked issues for current status and acceptance evidence. No application work or deployment has been performed in this phase.
+Status: implementation underway. API and frontend work have merged through PRs #9 and #10; container, pipeline, and deployment work continues. Follow the linked issues for current status and acceptance evidence.
 
 Milestone: [v1 — FastAPI CI/CD demonstration](https://github.com/kaw393939/is373_ci_cd/milestone/1).
 
@@ -42,7 +42,7 @@ Include tests with the behavior they verify. Use issue references in commits and
 - **Deployment:** the host's observed commit matches the published release; a passing workflow alone is insufficient.
 - **Demonstration:** a failure blocks release, a fix deploys, and rollback/resume work as documented.
 
-The initial documentation request authorizes the bootstrap and issue creation. These issues describe later implementation work; they do not claim it has started or passed.
+The owner has authorized implementation through a complete verified demo. Issue closure and evidence, rather than the original planning state, indicate what is finished.
 
 ## Deferred work
 

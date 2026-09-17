@@ -2,7 +2,7 @@
 
 A small calculator for learning how a change moves from local development through tests, a container registry, and automatic deployment.
 
-**Status: specification and repository setup only.** The application, tests, Docker configuration, and GitHub Actions workflows are planned; they do not exist yet. The commands in the specifications describe the intended interface, not a working quick start.
+**Status: implementation in progress.** The calculator, FastAPI API, and unit/integration/browser tests are implemented. Container verification, CI publication, and deployment are tracked in the linked issues. Production is not yet deployed.
 
 ## Start the review here
 

@@ -17,6 +17,8 @@ flowchart TB
 
 FastAPI serves the page and API from one origin, avoiding CORS configuration. Calculation logic has no dependency on HTTP, environment variables, or container runtime. The API layer translates validation and domain errors into the specified HTTP contract.
 
+Release metadata is baked into `app/release.json` inside the image and exposed through `/health`. It is not stored in runtime environment variables that an updater could carry over from the old container. The development source mount hides this generated file and reports `local`.
+
 Use Uvicorn in both environments: reload for development; a single process without reload for production. Use a maintained Python slim base image and pin dependency versions during implementation. Keep pytest, HTTPX test tooling, and browser binaries out of the production image. Playwright runs in CI tooling against the application container.
 
 ## Intended repository layout
