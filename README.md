@@ -26,7 +26,7 @@ make up
 
 WUD login: username `admin`; open local `.state/wud.env` for the generated password. That file is ignored and restricted to its owner. Use `make check-updates` to request a registry check without opening the dashboard.
 
-**Current machine's port conflict:** an unrelated container owns `8080`. Development was verified temporarily at `8082` with `DEV_PORT=8082 make up`; the committed default remains `8080`. The owner decision to free `8080` or retain an override is tracked in [#19](https://github.com/kaw393939/is373_ci_cd/issues/19). To retain an alternate local port, copy `.env.example` to `.env` and set `DEV_PORT=8082`.
+The local port conflict is resolved: development runs on `8080`. The previous Apache container was stopped with the owner's permission and retained intact ([#19](https://github.com/kaw393939/is373_ci_cd/issues/19)). For a different machine with an occupied port, copy `.env.example` to ignored `.env` and set `DEV_PORT`.
 
 ## Test and operate
 
@@ -68,7 +68,7 @@ Observed examples: first verification 58 seconds, first publication job 90 secon
 - [Testing strategy](docs/testing.md): the three boundaries and failure evidence.
 - [CI/CD specification](docs/ci-cd.md): gates, versioning, publication, and rollback.
 - [Implementation plan](docs/implementation-plan.md): issue history and dependencies.
-- [Demo runbook](docs/demo.md) and [evidence](docs/evidence.md).
+- [Demo runbook](docs/demo.md), [evidence](docs/evidence.md), and [final QA report](docs/qa.md).
 - [Contributing](CONTRIBUTING.md), [AI instructions](AGENTS.md), and [GitHub policy](docs/github-workflow.md).
 
 [Issues](https://github.com/kaw393939/is373_ci_cd/issues) · [Milestone](https://github.com/kaw393939/is373_ci_cd/milestone/1) · [Actions](https://github.com/kaw393939/is373_ci_cd/actions) · [Commit history](https://github.com/kaw393939/is373_ci_cd/commits/main/)
