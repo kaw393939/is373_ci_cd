@@ -2,7 +2,7 @@
 
 ## Purpose and current phase
 
-Build a minimal CI/CD teaching template: FastAPI, pytest, Playwright Python, and one HTML calculator page. See [README.md](README.md) for current status and [docs/spec.md](docs/spec.md) for requirements. The initial phase is documentation and GitHub setup only; application implementation starts under a later user request/issue.
+Build a minimal CI/CD teaching template: FastAPI, pytest, Playwright Python, and one HTML calculator page. See [README.md](README.md) for current status and [docs/spec.md](docs/spec.md) for requirements. Implementation is authorized. Follow the issue backlog through a verified running demo; update status and evidence as each issue is completed.
 
 ## Read before changing behavior
 

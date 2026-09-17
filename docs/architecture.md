@@ -1,6 +1,6 @@
 # Architecture and decisions
 
-Status: intended design; no runtime implementation exists yet.
+Status: implementation in progress. Environment facts below were inspected on 2026-09-17.
 
 ## Components
 
@@ -67,6 +67,17 @@ WUD's update trigger and Compose path handling require an implementation spike: 
 | Docker Hub and WUD | Demonstrates registry publication and host-side automatic deployment |
 | Commit-tagged images plus `:prod` | Traceable releases with a simple deployment channel |
 | No database | Keeps tests deterministic and the lesson focused |
+
+## Verified environment decisions
+
+- Deployment uses this Mac's Docker Desktop on `linux/arm64`, with services bound to loopback.
+- The GitHub repository and `kaw393939/is373_ci_cd` Docker Hub repository are public.
+- CI will use `ubuntu-24.04-arm` and publish a single `linux/arm64` image. This avoids emulation and tests the deployment architecture directly. AMD64 support is a future adaptation.
+- Python is `3.13.15`; uv `0.12.15` bootstraps locally under ignored `.tools/`, with the full dependency graph committed in `uv.lock`.
+- Python container base: `python:3.13.15-slim-bookworm`, pinned by digest in the Dockerfile when implemented.
+- WUD selected release: `9.0.2`, pinned by digest when implemented.
+- Docker Hub push permission remains to be verified by the first successful Actions publication.
+- Port `8080` is currently occupied by unrelated container `confident_mendel`; owner permission to stop it or use an alternate dev port is pending. No unrelated container has been changed.
 
 ## Open decisions
 
