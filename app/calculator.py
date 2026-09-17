@@ -26,7 +26,7 @@ def calculate(a: float, b: float, operation: Operation) -> float:
         case "subtract":
             result = a - b
         case "multiply":
-            result = a * b
+            result = a + b
         case "divide":
             if b == 0:
                 raise CalculationError("division_by_zero", "Cannot divide by zero.")
