@@ -1,0 +1,24 @@
+# Local configuration and credentials
+.env
+.env.*
+!.env.example
+
+# Python and tooling
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+*.egg-info/
+build/
+dist/
+
+# Browser test output
+test-results/
+playwright-report/
+
+# Local operating-system files
+.DS_Store
