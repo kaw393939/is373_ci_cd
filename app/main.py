@@ -1,17 +1,23 @@
 """HTTP contracts and release identity for the demo."""
 
 import os
+from pathlib import Path
 from typing import Annotated
 
 from fastapi import FastAPI, HTTPException
 from fastapi.exceptions import RequestValidationError
-from fastapi.responses import JSONResponse
+from fastapi.responses import FileResponse, JSONResponse
 from pydantic import BaseModel, ConfigDict, Field
 
 from app.calculator import LIMIT, CalculationError, Operation, calculate
 
 app = FastAPI(title="CI/CD Calculator", version="0.1.0")
 Operand = Annotated[float, Field(strict=True, ge=-LIMIT, le=LIMIT, allow_inf_nan=False)]
+
+
+@app.get("/", include_in_schema=False)
+def homepage():
+    return FileResponse(Path(__file__).with_name("index.html"), headers={"Cache-Control": "no-store"})
 
 
 @app.exception_handler(RequestValidationError)

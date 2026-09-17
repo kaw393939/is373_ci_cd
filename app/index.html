@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A small calculator that makes the CI/CD process visible.">
+  <title>Calculator / CI/CD Lab</title>
+  <style>
+    :root{color-scheme:light;--ink:#172c3b;--muted:#536775;--paper:#f4f2ed;--line:#d7dedc;--accent:#c34d29;--green:#226849}
+    *{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.5 system-ui,-apple-system,sans-serif}
+    header,main,footer{max-width:1000px;margin:auto;padding:0 32px}header{display:flex;justify-content:space-between;gap:16px;align-items:center;padding-top:30px;padding-bottom:24px;border-bottom:1px solid var(--line)}
+    .brand{font-weight:750;letter-spacing:.02em}.brand span{color:var(--muted);font-weight:400}.pill{font:12px/1.4 ui-monospace,monospace;padding:7px 12px;border:1px solid var(--line);border-radius:30px;background:white}
+    main{padding-top:48px;padding-bottom:40px}.eyebrow{font:12px ui-monospace,monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}h1{font-size:clamp(34px,5vw,54px);letter-spacing:-.045em;line-height:1.1;margin:16px 0}p.intro{max-width:630px;color:var(--muted);margin:0 0 32px}
+    .card{background:white;border:1px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:0 12px 34px #172c3b08}.card-head{padding:20px 26px;display:flex;justify-content:space-between;gap:16px;background:#fafbf9;border-bottom:1px solid var(--line)}h2{font-size:16px;margin:0}.step{font:12px ui-monospace,monospace;color:var(--muted)}form{padding:26px}fieldset{border:0;padding:0;margin:0;min-width:0}legend{position:absolute;clip-path:inset(50%);width:1px;height:1px;overflow:hidden}.inputs{display:grid;grid-template-columns:1fr 150px 1fr;gap:18px}
+    label{display:block;font-size:13px;font-weight:650;margin-bottom:8px}input,select{width:100%;padding:14px 12px;font:20px ui-monospace,monospace;color:var(--ink);background:#f9faf8;border:1px solid #adbcbf;border-radius:8px;min-height:55px}select{font-family:system-ui;font-size:18px}input:focus,select:focus,button:focus-visible{outline:3px solid #3978a5;outline-offset:3px}
+    .actions{display:flex;align-items:center;gap:20px;margin-top:22px}button{border:0;border-radius:8px;background:var(--ink);color:white;padding:14px 24px;font:650 15px system-ui;cursor:pointer}button:hover{background:#29495f}button:disabled{opacity:.6;cursor:wait}.hint{font-size:12px;color:var(--muted)}
+    .results{border-top:1px solid var(--line);padding:24px 26px;background:#f8faf8}.result-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px}.result-label{font:11px ui-monospace,monospace;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}output{display:block;font:36px/1.4 ui-monospace,monospace;overflow-wrap:anywhere}.result-note{font-size:12px;color:var(--muted)}#comparison{font-weight:650;color:var(--green);min-height:24px;margin-top:16px}#comparison[data-match="false"],#error{color:#a03621}#error{margin:0;min-height:24px;font-size:14px}
+    .path{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:24px;color:var(--muted);font:12px ui-monospace,monospace}.path b{font-weight:400;padding:5px 9px;background:#e7ebe5;border-radius:4px}.path span{color:#6b7f88}
+    footer{padding-bottom:30px;font:12px/1.7 ui-monospace,monospace;color:var(--muted)}.release{border-top:1px solid var(--line);padding-top:20px;display:flex;gap:12px 24px;flex-wrap:wrap}.release strong{font-weight:500;color:var(--ink)}
+    @media(max-width:600px){header,main,footer{padding-left:20px;padding-right:20px}main{padding-top:32px}.inputs{grid-template-columns:1fr}.card-head,form,.results{padding:20px}.actions{align-items:flex-start;flex-direction:column;gap:10px}.actions button{width:100%}.result-grid{gap:12px}output{font-size:27px}.brand span{display:none}.release{flex-direction:column;gap:6px}}
+  </style>
+</head>
+<body>
+  <header><div class="brand">CI/CD LAB <span>/ IS373</span></div><div class="pill" id="api-status" role="status">Checking API…</div></header>
+  <main>
+    <div class="eyebrow">One calculation. Two runtimes.</div>
+    <h1>Small app. Complete pipeline.</h1>
+    <p class="intro">Calculate in your browser, verify with Python, and see both results agree. Every production update arrives through the same tested release process.</p>
+    <section class="card" aria-labelledby="calculator-title">
+      <div class="card-head"><h2 id="calculator-title">Calculator</h2><span class="step">01 / INPUT → RESULT</span></div>
+      <form id="calculator" novalidate>
+        <fieldset id="fields"><legend>Calculator inputs</legend>
+          <div class="inputs">
+            <div><label for="a">First number</label><input id="a" name="a" inputmode="decimal" value="6" autocomplete="off" aria-describedby="input-hint"></div>
+            <div><label for="operation">Operation</label><select id="operation" name="operation"><option value="add">+ Add</option><option value="subtract">− Subtract</option><option value="multiply" selected>× Multiply</option><option value="divide">÷ Divide</option></select></div>
+            <div><label for="b">Second number</label><input id="b" name="b" inputmode="decimal" value="7" autocomplete="off" aria-describedby="input-hint"></div>
+          </div>
+          <div class="actions"><button type="submit" id="calculate">Calculate <span aria-hidden="true">↗</span></button><span class="hint" id="input-hint">Numbers from −1,000,000 to 1,000,000.<br>Decimals and negative numbers welcome.</span></div>
+        </fieldset>
+      </form>
+      <div class="results" aria-live="polite" aria-atomic="true">
+        <div class="result-grid">
+          <div><div class="result-label" id="browser-label">Browser result</div><output id="browser-result" aria-labelledby="browser-label">—</output><div class="result-note">JavaScript · calculated locally</div></div>
+          <div><div class="result-label" id="server-label">API result</div><output id="api-result" aria-labelledby="server-label">—</output><div class="result-note">Python · verified by FastAPI</div></div>
+        </div>
+        <div id="comparison">Ready when you are.</div><p id="error"></p>
+      </div>
+    </section>
+    <div class="path" aria-label="Release pipeline"><b>Commit</b><span>→</span><b>Unit + integration</b><span>→</span><b>Browser test</b><span>→</span><b>Docker Hub</b><span>→</span><b>Deploy</b></div>
+  </main>
+  <footer><div class="release"><div>Environment: <strong id="environment">Loading…</strong></div><div>Commit: <strong id="commit">—</strong></div><div>Built: <strong id="built-at">—</strong></div></div></footer>
+  <script>
+    const $ = id => document.getElementById(id);
+    const format = number => Number(number.toPrecision(10)).toString();
+    const operations = {add:(a,b)=>a+b, subtract:(a,b)=>a-b, multiply:(a,b)=>a*b, divide:(a,b)=>a/b};
+
+    async function loadHealth() {
+      try {
+        const response = await fetch('/health', {signal:AbortSignal.timeout(5000), cache:'no-store'});
+        if (!response.ok) throw new Error('Health unavailable');
+        const health = await response.json();
+        $('environment').textContent = health.environment;
+        $('commit').textContent = health.commit.slice(0, 7);
+        $('commit').title = health.commit;
+        $('built-at').textContent = health.built_at;
+        $('api-status').textContent = 'API available';
+      } catch {
+        $('api-status').textContent = 'API unavailable';
+        $('environment').textContent = 'Unavailable';
+      }
+    }
+
+    $('calculator').addEventListener('submit', async event => {
+      event.preventDefault();
+      if ($('fields').disabled) return;
+      $('error').textContent = '';
+      $('comparison').textContent = '';
+      delete $('comparison').dataset.match;
+      $('browser-result').textContent = '—';
+      $('api-result').textContent = '—';
+
+      const first = $('a').value.trim(), second = $('b').value.trim();
+      const a = Number(first), b = Number(second), operation = $('operation').value;
+      if (!first || !second) { $('error').textContent = 'Enter both numbers.'; return; }
+      if (![a,b].every(n => Number.isFinite(n) && Math.abs(n) <= 1000000)) {
+        $('error').textContent = 'Enter finite numbers between −1,000,000 and 1,000,000.'; return;
+      }
+      if (operation === 'divide' && b === 0) { $('error').textContent = 'Cannot divide by zero.'; return; }
+      const local = operations[operation](a,b);
+      if (!Number.isFinite(local)) { $('error').textContent = 'The result is too large to represent.'; return; }
+
+      $('browser-result').textContent = format(local);
+      $('api-result').textContent = '…';
+      $('fields').disabled = true;
+      try {
+        const response = await fetch('/api/calculate', {
+          method:'POST', headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({a,b,operation}), signal:AbortSignal.timeout(5000)
+        });
+        if (!response.ok) throw new Error('Calculation rejected. Check the inputs and try again.');
+        const data = await response.json();
+        if (typeof data.result !== 'number' || !Number.isFinite(data.result)) throw new Error('The API returned an invalid result.');
+        $('api-result').textContent = format(data.result);
+        const matches = Math.abs(local-data.result) <= Math.max(1e-9, 1e-9*Math.max(Math.abs(local),Math.abs(data.result)));
+        $('comparison').dataset.match = String(matches);
+        $('comparison').textContent = matches ? 'Results match' : 'Results differ';
+        $('api-status').textContent = 'API available';
+      } catch (error) {
+        $('api-result').textContent = 'Unavailable';
+        $('api-status').textContent = 'API unavailable';
+        $('error').textContent = error.name === 'TimeoutError' ? 'The API timed out. Try again.' : 'API verification failed. Check the service and try again.';
+      } finally {
+        $('fields').disabled = false;
+      }
+    });
+    loadHealth();
+  </script>
+</body>
+</html>
