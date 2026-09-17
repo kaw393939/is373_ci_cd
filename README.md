@@ -1,53 +1,74 @@
 # CI/CD calculator demo
 
-A small calculator for learning how a change moves from local development through tests, a container registry, and automatic deployment.
+A small FastAPI calculator that makes the path from a local edit to a tested production release visible. One HTML file calculates in JavaScript, verifies through Python, and shows whether the results agree.
 
-**Status: implementation in progress.** The calculator, FastAPI API, and unit/integration/browser tests are implemented. Container verification, CI publication, and deployment are tracked in the linked issues. Production is not yet deployed.
+**Implemented and rehearsed:** unit/integration/browser tests, Docker Hub publication, WUD automatic deployment, three deliberate test failures, and rollback/resume. See the [evidence record](docs/evidence.md) for actual runs, commits, digests, and timings.
 
-## Start the review here
+## Run the demo
 
-1. [Product specification](docs/spec.md) — calculator behavior and acceptance criteria.
-2. [Architecture](docs/architecture.md) — components, environments, and open decisions.
-3. [Testing strategy](docs/testing.md) — what unit, integration, and browser tests prove.
-4. [CI/CD specification](docs/ci-cd.md) — publishing, deployment, failure handling, and rollback.
-5. [Implementation plan](docs/implementation-plan.md) — ordered issues and completion criteria.
-6. [Demo walkthrough](docs/demo.md) — the eventual classroom demonstration.
+Prerequisites: Docker Desktop with ARM64 Linux containers, Git, `make`, and a bootstrap `python3` with pip. Python 3.13.15 and uv 0.12.15 install locally inside ignored `.tools/`; no global Python replacement is required. This initial image targets **linux/arm64**, matching the verified Mac and GitHub runner.
 
-## Intended experience
+```sh
+git clone git@github.com:kaw393939/is373_ci_cd.git
+cd is373_ci_cd
+make setup
+make browsers
+make up
+```
 
-Enter two numbers, select an operation, and click **Calculate**. The page calculates in JavaScript and requests the same calculation from FastAPI. It shows both results and whether they agree. A footer identifies the environment and deployed commit.
+`make up` builds the source-mounted development container, pulls the published production image, and starts WUD. You can use `make dev` before the first image is published in a new fork.
 
-| Component | Choice |
-| --- | --- |
-| Backend | Python, FastAPI, Uvicorn |
-| Frontend | One HTML file with inline CSS and JavaScript |
-| Unit and integration tests | pytest and FastAPI TestClient |
-| Browser tests | Playwright for Python, Chromium only |
-| Image registry | `kaw393939/is373_ci_cd` on Docker Hub |
-| Automation | GitHub Actions and What's Up Docker (WUD) |
-| Local services | Development on `8080`, production on `8090` |
+| Service | Default address | Behavior |
+| --- | --- | --- |
+| Development | [localhost:8080](http://localhost:8080) | Mounted local source with reload |
+| Production | [localhost:8090](http://localhost:8090) | Last passing image from Docker Hub |
+| WUD dashboard | [localhost:8091](http://localhost:8091) | Authenticated image monitoring and updates |
+
+WUD login: username `admin`; open local `.state/wud.env` for the generated password. That file is ignored and restricted to its owner. Use `make check-updates` to request a registry check without opening the dashboard.
+
+**Current machine's port conflict:** an unrelated container owns `8080`. Development was verified temporarily at `8082` with `DEV_PORT=8082 make up`; the committed default remains `8080`. The owner decision to free `8080` or retain an override is tracked in [#19](https://github.com/kaw393939/is373_ci_cd/issues/19). To retain an alternate local port, copy `.env.example` to `.env` and set `DEV_PORT=8082`.
+
+## Test and operate
+
+```sh
+make test-unit          # Pure Python arithmetic and release guards
+make test-integration   # Real FastAPI request/response contracts
+make build             # Build the release image once
+make test-e2e          # Chromium against that image on isolated port 18090
+make status            # Running services and production release
+make check-updates     # Ask WUD to check the registry now
+make down              # Stop this project's services; keep WUD data
+```
+
+Failed browser tests retain traces/screenshots under `artifacts/playwright`; CI uploads them for seven days. Local `make test-e2e` removes its temporary container even on failure. The release image has no browser or test packages.
+
+For rollback and resumption, use the [demo runbook](docs/demo.md). The Make commands preserve local rollback state; bare `docker compose up` does not read that state automatically.
+
+## Delivery flow
 
 ```mermaid
 flowchart LR
-    edit[Local edit] --> dev[Preview on :8080]
-    dev --> git[Push branch / open PR]
-    git --> checks[Unit + integration + build + E2E]
-    checks --> merge[Merge to main]
-    merge --> recheck[Test main and build release image]
-    recheck --> hub[Publish passing image to Docker Hub]
+    edit[Local edit / :8080] --> pr[Issue-linked PR]
+    pr --> checks[Unit → integration → build → E2E]
+    checks --> merge[Merge passing PR]
+    merge --> verify[Verify main release]
+    verify --> hub[Publish exact tested image]
     hub --> wud[WUD detects prod digest change]
-    wud --> prod[Production on :8090]
+    wud --> prod[Production / :8090]
 ```
 
-Publication and deployment are distinct: a green publishing workflow proves the image was published, while the production health response and commit prove that it was deployed.
+Only a passing `main` push publishes. PRs and manual verification never publish. Each release receives a `sha-<full-commit>` tag and the mutable `prod` channel. Production health and the page footer identify what actually deployed; a green publishing run alone is not deployment evidence.
 
-## Development workflow
+Observed examples: first verification 58 seconds, first publication job 90 seconds, cached publication job 56 seconds, automatic update about 39 seconds after publication. These are recorded observations, not timing guarantees.
 
-Work from an issue with linked requirement IDs, make focused commits, and use a pull request with validation evidence. Read [CONTRIBUTING.md](CONTRIBUTING.md) for the human workflow and [AGENTS.md](AGENTS.md) for AI development instructions.
+## Specifications and development
 
-- [GitHub issues](https://github.com/kaw393939/is373_ci_cd/issues)
-- [Project milestone](https://github.com/kaw393939/is373_ci_cd/milestones)
-- [Commit history](https://github.com/kaw393939/is373_ci_cd/commits/main/)
-- [GitHub configuration plan](docs/github-workflow.md)
+- [Product specification](docs/spec.md): numbered requirements and HTTP contract.
+- [Architecture](docs/architecture.md): components, runtime decisions, and adaptation.
+- [Testing strategy](docs/testing.md): the three boundaries and failure evidence.
+- [CI/CD specification](docs/ci-cd.md): gates, versioning, publication, and rollback.
+- [Implementation plan](docs/implementation-plan.md): issue history and dependencies.
+- [Demo runbook](docs/demo.md) and [evidence](docs/evidence.md).
+- [Contributing](CONTRIBUTING.md), [AI instructions](AGENTS.md), and [GitHub policy](docs/github-workflow.md).
 
-The deployment host, its CPU architecture, and Docker Hub visibility still need confirmation. See [open decisions](docs/architecture.md#open-decisions). No database, account system, frontend build tool, or public hosting is required for version 1.
+[Issues](https://github.com/kaw393939/is373_ci_cd/issues) · [Milestone](https://github.com/kaw393939/is373_ci_cd/milestone/1) · [Actions](https://github.com/kaw393939/is373_ci_cd/actions) · [Commit history](https://github.com/kaw393939/is373_ci_cd/commits/main/)

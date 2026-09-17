@@ -13,7 +13,7 @@ This repository teaches development history as well as deployment. Prefer small,
 7. Open a PR with acceptance evidence, scope, and any untested limitations.
 8. Merge when the issue's acceptance criteria are satisfied and required checks pass. A deployment issue also needs evidence from the running host.
 
-The initial documentation bootstrap goes directly to the empty repository's `main` branch so the specifications and issue forms can be reviewed on GitHub. Subsequent implementation should use branches and PRs. No review-approval count is enforced for the solo-maintainer demo; required CI checks can be enabled after a successful workflow exists.
+The initial documentation bootstrap goes directly to the empty repository's `main` branch so the specifications and issue forms can be reviewed on GitHub. Subsequent implementation should use branches and PRs. The solo-maintainer demo requires no reviewer approval count, but `main` now requires an up-to-date passing `verify` check and PRs, including for administrators.
 
 ## Atomic commits
 
@@ -30,9 +30,9 @@ ci: publish verified container images (#6)
 
 Use `Refs #N` while an issue is in progress and `Closes #N` in the completing PR. Preserve useful atomic commits using GitHub's merge-commit option; avoid squashing the whole implementation into one commit for this teaching repository. Review staged files before committing. Do not commit secrets, build output, local environment files, browser artifacts, or unrelated changes.
 
-## Planned command interface
+## Command interface
 
-These commands are requirements for implementation, not currently available commands:
+These commands are implemented. Start with `make setup` and `make browsers` when running tests locally.
 
 | Command | Contract |
 | --- | --- |
@@ -46,7 +46,7 @@ These commands are requirements for implementation, not currently available comm
 | `make rollback RELEASE=<sha-tag-or-digest>` | Pause updater and redeploy only prod to a known-good release |
 | `make resume-updates` | Restore the production channel and resume updates deliberately |
 
-Document environment prerequisites, image variables, and setup commands when these targets are implemented. Future framework adaptations keep this interface and replace its internals.
+Prerequisites and setup are in the README. `IMAGE` selects the locally built/tested image; `E2E_PORT` changes the isolated browser-test port. Future framework adaptations keep this interface and replace its internals. Use these Make targets to preserve `.state/release.env` and the updater pause marker during rollback.
 
 ## Validation and evidence
 

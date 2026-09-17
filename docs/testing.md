@@ -1,6 +1,6 @@
 # Testing strategy
 
-Status: unit, integration, and Chromium tests implemented and passing locally; CI evidence will be added during the pipeline work. The suite should be small enough that most feedback time comes from runner setup, image builds, and deployment polling rather than test execution.
+Status: implemented and verified locally, in GitHub Actions, and against the published production image. Current counts: 22 unit, 16 integration, and 7 Chromium tests. See [recorded evidence](evidence.md). The suite should be small enough that most feedback time comes from runner setup, image builds, and deployment polling rather than test execution.
 
 ## Test layers
 
@@ -31,7 +31,7 @@ Use parameterization to keep tests readable. Avoid broad browser matrices and ar
 | DEL-01–DEL-05 | Container/deployment checks and the recorded demo, not redundant unit tests of YAML |
 | DEL-06 | Deliberately fail a browser assertion and confirm uploaded trace/screenshot |
 
-Start with the success and zero-divisor browser scenarios; add the decimal and network failure scenarios before completing v1. Keep one Chromium worker, no automatic retries initially, and no fixed sleeps. Wait for readiness with a bounded health-check loop, then use Playwright's condition-based assertions.
+The suite includes success, empty/zero-divisor input, decimal, network failure, mismatch, and narrow-screen keyboard scenarios. Keep one Chromium worker, no automatic retries initially, and no fixed sleeps. Wait for readiness with a bounded health-check loop, then use Playwright's condition-based assertions.
 
 ## Commands and evidence
 
@@ -67,3 +67,5 @@ Introduce one fault at a time. Use a disposable demonstration branch/PR; no publ
 - [FastAPI testing](https://fastapi.tiangolo.com/tutorial/testing/)
 - [Playwright pytest integration](https://playwright.dev/python/docs/test-runners)
 - [Playwright trace viewer](https://playwright.dev/python/docs/trace-viewer-intro)
+
+Publication guard unit cases also reject PR/manual contexts, stale main commits, mismatched image IDs, and mismatched release identities. The pinned upstream TestClient currently emits two deprecation warnings; these do not fail the tests.
