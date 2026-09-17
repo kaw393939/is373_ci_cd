@@ -1,6 +1,6 @@
 # CI/CD specification
 
-Status: verification and Docker Hub publication are live. The first published release is running on port 8090; automatic replacement and rollback evidence are being completed in #7.
+Status: verification, Docker Hub publication, WUD automatic replacement, rollback, and resume have been exercised. See [the evidence record](evidence.md).
 
 ## Pipeline contract
 
@@ -83,3 +83,5 @@ Record the workflow URL, commit, published digest, WUD update evidence, and `/he
 - [Docker builds with GitHub Actions](https://docs.docker.com/build/ci/github-actions/)
 - [WUD digest monitoring](https://getwud.app/docs/configuration/watchers/)
 - [WUD Compose updates](https://getwud.app/docs/configuration/triggers/docker-compose/)
+
+The first ARM64 publication and second automatic deployment were both observed on the Docker Desktop host. WUD scans one opted-in container; its one-minute polling is for the demonstration. If registry checks are throttled, authenticate the registry or increase the interval. Stop the stack after the demo when it is not needed.

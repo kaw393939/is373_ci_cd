@@ -1,6 +1,6 @@
 # Architecture and decisions
 
-Status: implementation in progress. Environment facts below were inspected on 2026-09-17.
+Status: implemented and rehearsed on 2026-09-17. See [evidence](evidence.md).
 
 ## Components
 
@@ -21,9 +21,9 @@ Release metadata is baked into `app/release.json` inside the image and exposed t
 
 Use Uvicorn in both environments: reload for development; a single process without reload for production. Use a maintained Python slim base image and pin dependency versions during implementation. Keep pytest, HTTPX test tooling, and browser binaries out of the production image. Playwright runs in CI tooling against the application container.
 
-## Intended repository layout
+## Repository layout
 
-This is a target layout, not a listing of existing files:
+The implementation follows this layout:
 
 ```text
 app/
@@ -34,12 +34,11 @@ tests/
   unit/
   integration/
   e2e/
-  conftest.py
 Dockerfile
 compose.yaml
 Makefile
 pyproject.toml
-<dependency lock file>    # Exact format chosen in implementation
+uv.lock                   # Pinned complete dependency graph
 .github/workflows/ci.yml
 ```
 
@@ -55,7 +54,7 @@ Loopback binding is the proposed default for a local classroom demo. Remote/publ
 
 One Compose file should support `make dev` before any production image exists, then `make up` once the first release is published. Development and production must not share a source-code volume. WUD needs Docker control access to recreate containers; mounting a Docker socket read-only does not make Docker API access read-only. Treat the updater as a privileged local component, keep its dashboard local, and do not expose the daemon over unauthenticated TCP.
 
-WUD 9.0.2 uses its Docker container trigger for this project. Its Compose trigger matches literal image strings and rewrites the Compose file; our `prod` image is selected through an environment expression. The container trigger avoids that mismatch and avoids mounting/writing the source tree. It recreates only the opted-in production container and retains its ports, network, health check, and runtime environment. We will record an actual two-release update and Compose reconciliation in the demo evidence before closing deployment work.
+WUD 9.0.2 uses its Docker container trigger for this project. Its Compose trigger matches literal image strings and rewrites the Compose file; our `prod` image is selected through an environment expression. The container trigger avoids reliance on that string matching and avoids mounting/writing the source tree. It recreates only the opted-in production container and retains its ports, network, health check, and runtime environment. Automatic replacement and Compose reconciliation were verified: production changed release while the development container ID remained unchanged. Compose may recreate production once to reconcile its labels after a WUD update; it retains the current release.
 
 WUD requires authentication. `make up` generates a random local admin password in ignored `.state/wud.env` with mode `0600`; the dashboard is bound to `127.0.0.1:8091`. Credentials are never committed or printed by the commands. Open that local file yourself to log in as `admin`. Persistent WUD data lives in a named volume.
 
@@ -80,20 +79,12 @@ WUD requires authentication. `make up` generates a random local admin password i
 - Python is `3.13.15`; uv `0.12.15` bootstraps locally under ignored `.tools/`, with the full dependency graph committed in `uv.lock`.
 - Python container base: `python:3.13.15-slim-bookworm`, pinned by digest in the Dockerfile when implemented.
 - WUD selected release: `9.0.2`, pinned by digest when implemented.
-- Docker Hub push permission remains to be verified by the first successful Actions publication.
+- Docker Hub push permission was verified by successful Actions publication using the existing secret.
 - Port `8080` is currently occupied by unrelated container `confident_mendel`; owner permission to stop it or use an alternate dev port is pending. No unrelated container has been changed.
 
-## Open decisions
+## Remaining local port choice
 
-Resolve before the related implementation/deployment issue:
-
-| Question | Proposed default | Why it matters |
-| --- | --- | --- |
-| Where will production and WUD run? | This Mac via Docker Desktop, alongside dev | Local-only versus remote networking and availability |
-| What CPU architecture does that host use? | Inspect the actual host; do not assume | GitHub runner and deployment image must be compatible |
-| Is the Docker Hub repository public? | Confirm with owner/registry | Private pulls require host and updater authentication |
-| Does `DOCKER_API_KEY` permit pushes? | Verify during first publish without revealing the value | Secret existence alone does not prove permission |
-| Which Python/package tool and WUD release? | Maintained versions pinned at implementation | Reproducibility and version-specific configuration |
+Port `8080` was already occupied by unrelated container `confident_mendel`. Its owner has been asked whether to stop it or retain development on `8082`. No unrelated container was changed. The default Compose configuration is `8080`; tests and local rehearsal used the temporary `DEV_PORT=8082` override. Other host, architecture, registry, and version choices above are resolved.
 
 For the shortest demo use a single deployment architecture and a compatible CI runner where practical. If that is unavailable, explicitly choose emulation or multi-platform builds and record the build-time tradeoff. Browser-test the deployable architecture, or state clearly when only one architecture of a multi-platform release was tested. Never silently ship an AMD64-only image to an ARM64 host.
 

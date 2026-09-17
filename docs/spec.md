@@ -1,6 +1,6 @@
 # Product specification
 
-Status: initial specification for review. Requirement IDs are stable references for issues, tests, and pull requests. Proposed defaults below may be changed through a documented specification update.
+Status: implemented contract for version 1. Requirement IDs are stable references for issues, tests, and pull requests. Proposed defaults below may be changed through a documented specification update.
 
 ## Goal and scope
 

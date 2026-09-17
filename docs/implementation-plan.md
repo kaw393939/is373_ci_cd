@@ -1,6 +1,6 @@
 # Implementation plan
 
-Status: implementation underway. API and frontend work have merged through PRs #9 and #10; container, pipeline, and deployment work continues. Follow the linked issues for current status and acceptance evidence.
+Status: the application and delivery implementation has merged through PRs #9, #10, #11, #12, and #14. Automatic deployment, rollback, and three failure gates have been rehearsed. See [evidence](evidence.md) and issue status for the remaining local port decision and documentation review.
 
 Milestone: [v1 — FastAPI CI/CD demonstration](https://github.com/kaw393939/is373_ci_cd/milestone/1).
 
@@ -47,3 +47,7 @@ The owner has authorized implementation through a complete verified demo. Issue 
 ## Deferred work
 
 Public hosting/TLS, authentication, databases, a frontend framework, multiple browser engines, multi-host orchestration, automatic rollback, zero-downtime deployment, GitHub Projects automation, and mandatory external reviewers are outside v1. Add them only through a new issue with a clear teaching purpose.
+
+## Demonstration tracking
+
+[#13](https://github.com/kaw393939/is373_ci_cd/issues/13) records three intentionally broken PRs: [unit #15](https://github.com/kaw393939/is373_ci_cd/pull/15), [integration #16](https://github.com/kaw393939/is373_ci_cd/pull/16), and [E2E #17](https://github.com/kaw393939/is373_ci_cd/pull/17). All were closed without merging; their history is retained for teaching.
