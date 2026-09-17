@@ -45,7 +45,7 @@ class CalculationResponse(BaseModel):
 @app.post("/api/calculate", response_model=CalculationResponse)
 def calculate_route(request: CalculationRequest):
     try:
-        return {"result": calculate(request.a, request.b, request.operation)}
+        return {"answer": calculate(request.a, request.b, request.operation)}
     except CalculationError as error:
         raise HTTPException(
             status_code=400, detail={"code": error.code, "message": str(error)}
