@@ -1,6 +1,6 @@
 # Implementation plan
 
-Status: the application and delivery implementation has merged through PRs #9, #10, #11, #12, and #14. Automatic deployment, rollback, and three failure gates have been rehearsed. See [evidence](evidence.md) and issue status for the remaining local port decision and documentation review.
+Status: the application and delivery implementation has merged through PRs #9, #10, #11, #12, and #14. Automatic deployment, rollback, and three failure gates have been rehearsed. The final port decision is resolved; see [final QA](qa.md) and [evidence](evidence.md) for verification.
 
 Milestone: [v1 — FastAPI CI/CD demonstration](https://github.com/kaw393939/is373_ci_cd/milestone/1).
 
@@ -52,4 +52,4 @@ Public hosting/TLS, authentication, databases, a frontend framework, multiple br
 
 [#13](https://github.com/kaw393939/is373_ci_cd/issues/13) records three intentionally broken PRs: [unit #15](https://github.com/kaw393939/is373_ci_cd/pull/15), [integration #16](https://github.com/kaw393939/is373_ci_cd/pull/16), and [E2E #17](https://github.com/kaw393939/is373_ci_cd/pull/17). All were closed without merging; their history is retained for teaching.
 
-[#19](https://github.com/kaw393939/is373_ci_cd/issues/19) isolates the remaining local 8080 conflict. The functional demo is running with development temporarily on 8082; the owner decision is required before stopping the unrelated Apache container.
+[#19](https://github.com/kaw393939/is373_ci_cd/issues/19) records the resolved port conflict: the owner authorized stopping the old Apache container, and development now runs on 8080. [#22](https://github.com/kaw393939/is373_ci_cd/issues/22) tracks the final system review and QA.

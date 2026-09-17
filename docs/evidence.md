@@ -60,8 +60,8 @@ Production stayed on the first release throughout the three test-gate demonstrat
 - The Docker Hub repository is public; pull authentication was not needed. Push access was proven only in Actions using the existing secret.
 - `main` requires PRs, an up-to-date passing `verify`, and resolved conversations, including for administrators. Force pushes/deletion are blocked; external reviewer approval is not required for this solo demo.
 
-## Remaining local setup choice
+## Final local setup
 
-Development used port `8082` because the unrelated `apache_with_vim` container `confident_mendel` owns `8080`. Its owner has been asked whether to stop it or retain an override. The repository default remains `8080`; no unrelated container was stopped. This is tracked in [#19](https://github.com/kaw393939/is373_ci_cd/issues/19), separate from the verified production pipeline.
+The initial rehearsal used development port `8082`. The owner then authorized stopping the conflicting Apache container `confident_mendel`; it is stopped and retained intact. Final QA verified development on `8080`, production on `8090`, and WUD on `8091`. The port change preserved production. See [#19](https://github.com/kaw393939/is373_ci_cd/issues/19) and the [final QA report](qa.md).
 
 Later documentation commits can produce newer releases. Treat the identities above as the preserved rehearsal baseline; use `make status` for the live version.

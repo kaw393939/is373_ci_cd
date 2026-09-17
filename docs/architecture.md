@@ -50,7 +50,7 @@ uv.lock                   # Pinned complete dependency graph
 | `prod` | `127.0.0.1:8090` → container `8000` | Docker Hub image | Recreated after a passing release |
 | `wud` | Optional `127.0.0.1:8091` dashboard | Pinned WUD image | Registry polling and production update |
 
-Loopback binding is the proposed default for a local classroom demo. Remote/public access is an open decision, not implied by the name “production.” Production here means the release-built runtime. Map different host ports to the same internal application port.
+Loopback binding is the verified default for this local classroom demo. Remote/public access is outside v1. Production here means the release-built runtime. Map different host ports to the same internal application port.
 
 One Compose file should support `make dev` before any production image exists, then `make up` once the first release is published. Development and production must not share a source-code volume. WUD needs Docker control access to recreate containers; mounting a Docker socket read-only does not make Docker API access read-only. Treat the updater as a privileged local component, keep its dashboard local, and do not expose the daemon over unauthenticated TCP.
 
@@ -75,16 +75,16 @@ WUD requires authentication. `make up` generates a random local admin password i
 
 - Deployment uses this Mac's Docker Desktop on `linux/arm64`, with services bound to loopback.
 - The GitHub repository and `kaw393939/is373_ci_cd` Docker Hub repository are public.
-- CI will use `ubuntu-24.04-arm` and publish a single `linux/arm64` image. This avoids emulation and tests the deployment architecture directly. AMD64 support is a future adaptation.
+- CI uses `ubuntu-24.04-arm` and publish a single `linux/arm64` image. This avoids emulation and tests the deployment architecture directly. AMD64 support is a future adaptation.
 - Python is `3.13.15`; uv `0.12.15` bootstraps locally under ignored `.tools/`, with the full dependency graph committed in `uv.lock`.
-- Python container base: `python:3.13.15-slim-bookworm`, pinned by digest in the Dockerfile when implemented.
-- WUD selected release: `9.0.2`, pinned by digest when implemented.
+- Python container base: `python:3.13.15-slim-bookworm`, pinned by digest in the Dockerfile.
+- WUD selected release: `9.0.2`, pinned by digest in Compose.
 - Docker Hub push permission was verified by successful Actions publication using the existing secret.
-- Port `8080` is currently occupied by unrelated container `confident_mendel`; owner permission to stop it or use an alternate dev port is pending. No unrelated container has been changed.
+- Development runs on `8080`; the owner authorized stopping the previous Apache container `confident_mendel`, which remains intact.
 
-## Remaining local port choice
+## Local port resolution
 
-Port `8080` was already occupied by unrelated container `confident_mendel`. Its owner has been asked whether to stop it or retain development on `8082`. No unrelated container was changed. The default Compose configuration is `8080`; tests and local rehearsal used the temporary `DEV_PORT=8082` override. Other host, architecture, registry, and version choices above are resolved. The remaining port choice is tracked in [#19](https://github.com/kaw393939/is373_ci_cd/issues/19).
+The initial rehearsal used `8082` because `confident_mendel` occupied `8080`. The owner subsequently authorized stopping it. Final QA verified development on `8080`, production on `8090`, and WUD on `8091`; the port change left production running. [#19](https://github.com/kaw393939/is373_ci_cd/issues/19) records the resolution. To restore the old Apache container later, first free `8080`, then run `docker start confident_mendel`.
 
 For the shortest demo use a single deployment architecture and a compatible CI runner where practical. If that is unavailable, explicitly choose emulation or multi-platform builds and record the build-time tradeoff. Browser-test the deployable architecture, or state clearly when only one architecture of a multi-platform release was tested. Never silently ship an AMD64-only image to an ARM64 host.
 
