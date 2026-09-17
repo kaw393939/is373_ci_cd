@@ -7,6 +7,8 @@
 __pycache__/
 *.py[cod]
 .venv/
+.tools/
+.state/
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
@@ -19,6 +21,7 @@ dist/
 # Browser test output
 test-results/
 playwright-report/
+artifacts/
 
 # Local operating-system files
 .DS_Store
