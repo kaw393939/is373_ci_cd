@@ -55,7 +55,9 @@ Loopback binding is the proposed default for a local classroom demo. Remote/publ
 
 One Compose file should support `make dev` before any production image exists, then `make up` once the first release is published. Development and production must not share a source-code volume. WUD needs Docker control access to recreate containers; mounting a Docker socket read-only does not make Docker API access read-only. Treat the updater as a privileged local component, keep its dashboard local, and do not expose the daemon over unauthenticated TCP.
 
-WUD's update trigger and Compose path handling require an implementation spike: prove that it updates only `prod`, retains the desired Compose configuration, and leaves `dev` running. If the Compose trigger cannot provide this behavior, record the decision to use WUD's container trigger and verify Compose reconciliation before adopting it. Do not silently broaden the update scope.
+WUD 9.0.2 uses its Docker container trigger for this project. Its Compose trigger matches literal image strings and rewrites the Compose file; our `prod` image is selected through an environment expression. The container trigger avoids that mismatch and avoids mounting/writing the source tree. It recreates only the opted-in production container and retains its ports, network, health check, and runtime environment. We will record an actual two-release update and Compose reconciliation in the demo evidence before closing deployment work.
+
+WUD requires authentication. `make up` generates a random local admin password in ignored `.state/wud.env` with mode `0600`; the dashboard is bound to `127.0.0.1:8091`. Credentials are never committed or printed by the commands. Open that local file yourself to log in as `admin`. Persistent WUD data lives in a named volume.
 
 ## Decisions already made
 

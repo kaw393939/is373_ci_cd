@@ -1,6 +1,6 @@
 # CI/CD specification
 
-Status: intended behavior. There are no workflows, release images verified by this project, or deployed services yet.
+Status: verification and Docker Hub publication are live. The first published release is running on port 8090; automatic replacement and rollback evidence are being completed in #7.
 
 ## Pipeline contract
 
@@ -72,7 +72,7 @@ The implementation must provide `make rollback RELEASE=<sha-tag-or-digest>` that
 4. Check health and verify the previous commit on `8090`.
 5. Leave WUD paused, visibly documenting that state.
 
-A separate documented `make resume-updates` restores the `:prod` channel/clears the local override, then resumes the updater after the desired release is verified. Explain that resuming while `:prod` still points at the faulty release will deploy it again. These commands are proposed interfaces, not implemented commands.
+A separate documented `make resume-updates` restores the `:prod` channel/clears the local override, then resumes the updater after the desired release is verified. Explain that resuming while `:prod` still points at the faulty release will deploy it again. These commands are implemented in `scripts/runtime.py`. Rollback accepts a `sha-<full-commit>` tag or `sha256:<digest>` from this repository. `make up` respects the persisted pause marker.
 
 ## Completion evidence
 
