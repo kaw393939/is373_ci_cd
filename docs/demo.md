@@ -11,7 +11,7 @@ make up
 make status
 ```
 
-If port `8080` is occupied, resolve that conflict or configure `DEV_PORT` in an ignored `.env` file. The current rehearsal used `8082` without stopping the unrelated Apache container; [#2](https://github.com/kaw393939/is373_ci_cd/issues/2) tracks the owner decision.
+If port `8080` is occupied, resolve that conflict or configure `DEV_PORT` in an ignored `.env` file. The current rehearsal used `8082` without stopping the unrelated Apache container; [#19](https://github.com/kaw393939/is373_ci_cd/issues/19) tracks the owner decision.
 
 Open development, production at `http://localhost:8090`, [Actions](https://github.com/kaw393939/is373_ci_cd/actions), and optionally WUD at `http://localhost:8091`. Log into WUD as `admin` using the password in local `.state/wud.env`.
 

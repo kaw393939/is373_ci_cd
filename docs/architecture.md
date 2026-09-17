@@ -84,7 +84,7 @@ WUD requires authentication. `make up` generates a random local admin password i
 
 ## Remaining local port choice
 
-Port `8080` was already occupied by unrelated container `confident_mendel`. Its owner has been asked whether to stop it or retain development on `8082`. No unrelated container was changed. The default Compose configuration is `8080`; tests and local rehearsal used the temporary `DEV_PORT=8082` override. Other host, architecture, registry, and version choices above are resolved.
+Port `8080` was already occupied by unrelated container `confident_mendel`. Its owner has been asked whether to stop it or retain development on `8082`. No unrelated container was changed. The default Compose configuration is `8080`; tests and local rehearsal used the temporary `DEV_PORT=8082` override. Other host, architecture, registry, and version choices above are resolved. The remaining port choice is tracked in [#19](https://github.com/kaw393939/is373_ci_cd/issues/19).
 
 For the shortest demo use a single deployment architecture and a compatible CI runner where practical. If that is unavailable, explicitly choose emulation or multi-platform builds and record the build-time tradeoff. Browser-test the deployable architecture, or state clearly when only one architecture of a multi-platform release was tested. Never silently ship an AMD64-only image to an ARM64 host.
 

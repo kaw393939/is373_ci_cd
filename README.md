@@ -26,7 +26,7 @@ make up
 
 WUD login: username `admin`; open local `.state/wud.env` for the generated password. That file is ignored and restricted to its owner. Use `make check-updates` to request a registry check without opening the dashboard.
 
-**Current machine's port conflict:** an unrelated container owns `8080`. Development was verified temporarily at `8082` with `DEV_PORT=8082 make up`; the committed default remains `8080`. The owner decision to free `8080` or retain an override is tracked in [#2](https://github.com/kaw393939/is373_ci_cd/issues/2). To retain an alternate local port, copy `.env.example` to `.env` and set `DEV_PORT=8082`.
+**Current machine's port conflict:** an unrelated container owns `8080`. Development was verified temporarily at `8082` with `DEV_PORT=8082 make up`; the committed default remains `8080`. The owner decision to free `8080` or retain an override is tracked in [#19](https://github.com/kaw393939/is373_ci_cd/issues/19). To retain an alternate local port, copy `.env.example` to `.env` and set `DEV_PORT=8082`.
 
 ## Test and operate
 

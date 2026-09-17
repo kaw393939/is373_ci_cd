@@ -62,6 +62,6 @@ Production stayed on the first release throughout the three test-gate demonstrat
 
 ## Remaining local setup choice
 
-Development used port `8082` because the unrelated `apache_with_vim` container `confident_mendel` owns `8080`. Its owner has been asked whether to stop it or retain an override. The repository default remains `8080`; no unrelated container was stopped. This is tracked in [#2](https://github.com/kaw393939/is373_ci_cd/issues/2), separate from the verified production pipeline.
+Development used port `8082` because the unrelated `apache_with_vim` container `confident_mendel` owns `8080`. Its owner has been asked whether to stop it or retain an override. The repository default remains `8080`; no unrelated container was stopped. This is tracked in [#19](https://github.com/kaw393939/is373_ci_cd/issues/19), separate from the verified production pipeline.
 
 Later documentation commits can produce newer releases. Treat the identities above as the preserved rehearsal baseline; use `make status` for the live version.

@@ -51,3 +51,5 @@ Public hosting/TLS, authentication, databases, a frontend framework, multiple br
 ## Demonstration tracking
 
 [#13](https://github.com/kaw393939/is373_ci_cd/issues/13) records three intentionally broken PRs: [unit #15](https://github.com/kaw393939/is373_ci_cd/pull/15), [integration #16](https://github.com/kaw393939/is373_ci_cd/pull/16), and [E2E #17](https://github.com/kaw393939/is373_ci_cd/pull/17). All were closed without merging; their history is retained for teaching.
+
+[#19](https://github.com/kaw393939/is373_ci_cd/issues/19) isolates the remaining local 8080 conflict. The functional demo is running with development temporarily on 8082; the owner decision is required before stopping the unrelated Apache container.
