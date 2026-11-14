@@ -1,4 +1,4 @@
-FROM python:3.13.15-slim-trixie@sha256:7c61056e61ac89e852de05f3dc6fa51a6dd2181797bceed46aa725dd7cb2cd3b AS base
+FROM python:3.13.18-slim-trixie@sha256:e48f59cdba69a3cbd9ed2cf0f348d90d45a8d350d98134cf1070bc106ee9ed90 AS base
 # Apply distro security fixes published after the pinned base was built.
 # CI tests, scans, and publishes the resulting saved artifact without rebuilding.
 RUN apt-get update \
@@ -7,7 +7,7 @@ RUN apt-get update \
 
 FROM base AS dependencies
 WORKDIR /app
-RUN pip install --no-cache-dir uv==0.12.15
+RUN pip install --no-cache-dir uv==0.13.8
 COPY pyproject.toml uv.lock ./
 RUN uv sync --frozen --no-dev --no-install-project --python /usr/local/bin/python
 
